@@ -3,6 +3,7 @@ const express = require('express');
 const path = require('path');
 const app = express();
 const port = process.env.PORT || 4668;
+const decorateBeats = require('./utils/analyzeBeats.js');
 
 app.use(express.static(path.join(__dirname, '..', 'dist')));
 
@@ -23,9 +24,21 @@ app.get('/api', (req, res) => {
       //console.log(analysis.body.segments);
       //var events = analysis.body.segments.map(segment2event);
       //res.send(events);
-      res.send(analysis.body.beats);
+      console.log(analysis.body.beats[0]);
+      decorateBeats(analysis.body.beats, analysis.body.segments, (err, beats) => {
+        if (err) {
+          console.log('errrrr');
+          res.status(500).send(err);
+        } else {
+          console.log('here');
+          res.send(beats);
+        }
+      });
     })
-    .catch(err => res.status(500).send(err));
+    .catch(err => {
+      console.error(err);
+      res.status(500).send(err)
+    });
 });
 
 
