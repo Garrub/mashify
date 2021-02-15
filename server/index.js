@@ -41,7 +41,6 @@ app.get('/api', (req, res) => {
     .then(() => spotifyApi.searchTracks('track:baby one more time artist:Britney Spears'))
     .then(data => spotifyApi.getAudioAnalysisForTrack(data.body.tracks.items[0].id))
     .then(analysis => {
-      console.log(analysis.body.segments.filter(x => !x.start));
       decorateBeats(analysis.body.beats, analysis.body.segments)
       song2 = analysis.body.beats;
     })

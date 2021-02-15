@@ -1,62 +1,37 @@
-import React, {useEffect, useState} from 'react';
-import * as Tone from 'tone'
+import React, {useEffect, useState, useRef} from 'react';
 
 const App = () => {
-  const [events, setEvents] = useState([]);
-  /*const AMinorScale = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
-  const addOctaveNumbers = (scale, octaveNumber) => scale.map(note => {
-    const firstOctaveNoteIndex = scale.indexOf('C') !== -1 ? scale.indexOf('C') : scale.indexOf('C#')
-    const noteOctaveNumber = scale.indexOf(note) < firstOctaveNoteIndex ? octaveNumber - 1 : octaveNumber;
-    return `${note}${noteOctaveNumber}`
-  });
-  const AMinorScaleWithOctave = addOctaveNumbers(AMinorScale, 4);
-  */
-  const synth = new Tone.Synth().toMaster()
-  /*
-  AMinorScaleWithOctave.forEach((note, index) => {
-    synth.triggerAttackRelease(note, '4n', index + 1)
-  });
-  */
+  const [paths, setPaths] = useState([]);
+  const audio1 = useRef();
+  const audio2 = useRef();
+
+
   useEffect(() => {
     fetch('/api')
       .then(response => response.json())
-      .then(events => {
-        console.log(events);
-        setEvents(events);
-        console.log('events loaded');
+      .then(paths => {
+        console.log(paths);
+        setPaths(paths);
+        console.log('paths loaded');
       })
       .catch(err => console.error(err));
   }, []);
 
   useEffect(() => {
-    if (events.length === 0) {
+    if (paths.length === 0) {
       return;
     }
-    var part = new Tone.Part((time, value) => {
-      synth.triggerAttackRelease(value.note, value.duration, time)
-    }, events).start(0);
-  }, [events]);
+    setInterval(() => {
+      console.log(audio1.current.currentTime);
+    }, 1000);
+  }, [paths]);
 
-  return <div>
-    <button id="enable-tone" onClick={
-      () => {
-        Tone.start();
-      }
-    }>
-      Enable Tone
-    </button>
-    <button id="play-button" onClick={
-    () => {
-      if (Tone.Transport.state !== 'started'){
-        Tone.Transport.start();
-        console.log('start');
-      } else {
-        Tone.Transport.stop();
-        console.log('stop');
-      }
-    }
-  }>Play/Pause</button>
-  </div>;
+  return (
+    <div>
+      <audio ref={audio1} src="assets/music/oopsIDidItAgain.mp3" preload="auto" type="audio/mpeg" controls>Your browser does not support the audio tag</audio>
+      <audio ref={audio2} src="assets/music/babyOneMoreTime.mp3" preload="auto" type="audio/mpeg" controls>Your browser does not support the audio tag</audio>
+    </div>
+  );
 };
 
 export default App;
