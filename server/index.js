@@ -46,7 +46,7 @@ app.get('/api', (req, res) => {
       song2 = analysis.body.beats;
     })
     .then(() => {
-      res.send(getMatchingBeats(song1, song2));
+      res.send([getMatchingBeats(song1, song2), getMatchingBeats(song2, song1)]);
     })
     .catch(err => {
       console.error(err);
