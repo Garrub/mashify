@@ -3,7 +3,7 @@ const express = require('express');
 const path = require('path');
 const app = express();
 const port = process.env.PORT || 4668;
-const decorateBeats = require('./utils/analyzeBeats.js');
+const {decorateBeats, getMatchingBeats} = require('./utils/analyzeBeats.js');
 
 app.use(express.static(path.join(__dirname, '..', 'dist')));
 
@@ -14,6 +14,8 @@ var spotifyApi = new SpotifyWebApi({
 });
 
 app.get('/api', (req, res) => {
+  var song1;
+  var song2;
   spotifyApi.clientCredentialsGrant()
     .then(data => {
       spotifyApi.setAccessToken(data.body['access_token']);
@@ -24,8 +26,7 @@ app.get('/api', (req, res) => {
       //console.log(analysis.body.segments);
       //var events = analysis.body.segments.map(segment2event);
       //res.send(events);
-      console.log(analysis.body.beats[0]);
-      decorateBeats(analysis.body.beats, analysis.body.segments, (err, beats) => {
+      /*decorateBeats(analysis.body.beats, analysis.body.segments, (err, beats) => {
         if (err) {
           console.log('errrrr');
           res.status(500).send(err);
@@ -33,7 +34,19 @@ app.get('/api', (req, res) => {
           console.log('here');
           res.send(beats);
         }
-      });
+      });*/
+      decorateBeats(analysis.body.beats, analysis.body.segments);
+      song1 = analysis.body.beats
+    })
+    .then(() => spotifyApi.searchTracks('track:baby one more time artist:Britney Spears'))
+    .then(data => spotifyApi.getAudioAnalysisForTrack(data.body.tracks.items[0].id))
+    .then(analysis => {
+      console.log(analysis.body.segments.filter(x => !x.start));
+      decorateBeats(analysis.body.beats, analysis.body.segments)
+      song2 = analysis.body.beats;
+    })
+    .then(() => {
+      res.send(getMatchingBeats(song1, song2));
     })
     .catch(err => {
       console.error(err);
