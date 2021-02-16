@@ -13,18 +13,6 @@ const arrayAvg = (arr) => {
 };
 
 const decorateBeats = (beats, segments) => {
-  // beats shape
-  //// start
-  //// duration
-  //// confidence
-
-  // segment shape (partial)
-  //// start
-  //// duration
-  //// confidence
-  //// pitch
-  //// timbre
-  //// loudness
   var seg = 0;
 
   for (var i = 0; i < beats.length; i++) {
@@ -59,7 +47,7 @@ const getEuclideanDistance = (v1, v2) => {
   return Math.sqrt(v1.map((val, i) => (val - v2[i]) ** 2).reduce((tot, cur) => tot + cur));
 };
 
-const getMatchingBeats = (beats1, beats2, same) => {
+const getMatchingBeats = (beats1, beats2, same, timbreThresh = TIMBRE_DIST_THRESH, pitchThresh = PITCH_DIST_THRESH, loudThresh = LOUDNESS_THRESH) => {
   //I: two sets of beats with pitches and timbre data
   //O: list of matches:
   //// 0: song1 beat data
@@ -71,7 +59,7 @@ const getMatchingBeats = (beats1, beats2, same) => {
   //E: if max loudness is below LOUDNESS_THRESH, ignore the pair
   var matches = [];
   for (var i = 0; i < beats1.length; i++) {
-    if (beats1[i].pitches === null || beats1[i].maxLoudness < LOUDNESS_THRESH) {
+    if (beats1[i].pitches === null || beats1[i].maxLoudness < loudThresh) {
       continue;
     }
     var minDist = {}
@@ -79,15 +67,15 @@ const getMatchingBeats = (beats1, beats2, same) => {
       if (same === 'same' && i === j) {
         continue;
       }
-      if (beats2[j].pitches === null || beats2[j].maxLoudness < LOUDNESS_THRESH) {
+      if (beats2[j].pitches === null || beats2[j].maxLoudness < loudThresh) {
         continue;
       }
       var pitchDist = getEuclideanDistance(beats1[i].pitches, beats2[j].pitches);
-      if (pitchDist > PITCH_DIST_THRESH) {
+      if (pitchDist > pitchThresh) {
         continue;
       }
       var timbreDist = getEuclideanDistance(beats1[i].timbre, beats2[j].timbre);
-      if (timbreDist > TIMBRE_DIST_THRESH) {
+      if (timbreDist > timbreThresh) {
         continue;
       }
       var overall = Math.sqrt(5 * timbreDist ** 2 + pitchDist ** 2);
