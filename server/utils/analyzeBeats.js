@@ -1,5 +1,5 @@
-const PITCH_DIST_THRESH = 20;
-const TIMBRE_DIST_THRESH = 30;
+const PITCH_DIST_THRESH = 10;
+const TIMBRE_DIST_THRESH = 15;
 const LOUDNESS_THRESH = -40;
 
 const arrayAvg = (arr) => {

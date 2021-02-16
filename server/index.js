@@ -60,7 +60,7 @@ app.get('/api2', (req, res) => {
     .then(data => {
       spotifyApi.setAccessToken(data.body['access_token']);
     })
-    .then(() => spotifyApi.searchTracks('track:oops I did it again artist:Britney Spears'))
+    .then(() => spotifyApi.searchTracks('track:baby one more time artist:Britney Spears'))
     .then(data => spotifyApi.getAudioAnalysisForTrack(data.body.tracks.items[0].id))
     .then(analysis => {
       //console.log(analysis.body.segments);
