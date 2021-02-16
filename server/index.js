@@ -53,6 +53,42 @@ app.get('/api', (req, res) => {
     });
 });
 
+app.get('/api2', (req, res) => {
+  var song1;
+  var song2;
+  spotifyApi.clientCredentialsGrant()
+    .then(data => {
+      spotifyApi.setAccessToken(data.body['access_token']);
+    })
+    .then(() => spotifyApi.searchTracks('track:oops I did it again artist:Britney Spears'))
+    .then(data => spotifyApi.getAudioAnalysisForTrack(data.body.tracks.items[0].id))
+    .then(analysis => {
+      //console.log(analysis.body.segments);
+      //var events = analysis.body.segments.map(segment2event);
+      //res.send(events);
+      /*decorateBeats(analysis.body.beats, analysis.body.segments, (err, beats) => {
+        if (err) {
+          console.log('errrrr');
+          res.status(500).send(err);
+        } else {
+          console.log('here');
+          res.send(beats);
+        }
+      });*/
+      decorateBeats(analysis.body.beats, analysis.body.segments);
+      song1 = analysis.body.beats;
+      song2 = analysis.body.beats;
+    })
+    .then(() => {
+      var match = getMatchingBeats(song1, song2, 'same');
+      res.send([match, match]);
+    })
+    .catch(err => {
+      console.error(err);
+      res.status(500).send(err)
+    });
+});
+
 
 app.listen(port, () => {
   console.log(`Server is now listening on port ${port}`);

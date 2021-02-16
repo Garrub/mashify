@@ -1,5 +1,5 @@
-const PITCH_DIST_THRESH = 1;
-const TIMBRE_DIST_THRESH = 25;
+const PITCH_DIST_THRESH = 20;
+const TIMBRE_DIST_THRESH = 30;
 const LOUDNESS_THRESH = -40;
 
 const arrayAvg = (arr) => {
@@ -59,7 +59,7 @@ const getEuclideanDistance = (v1, v2) => {
   return Math.sqrt(v1.map((val, i) => (val - v2[i]) ** 2).reduce((tot, cur) => tot + cur));
 };
 
-const getMatchingBeats = (beats1, beats2) => {
+const getMatchingBeats = (beats1, beats2, same) => {
   //I: two sets of beats with pitches and timbre data
   //O: list of matches:
   //// 0: song1 beat data
@@ -76,6 +76,9 @@ const getMatchingBeats = (beats1, beats2) => {
     }
     var minDist = {}
     for (var j = 0; j < beats2.length; j++) {
+      if (same === 'same' && i === j) {
+        continue;
+      }
       if (beats2[j].pitches === null || beats2[j].maxLoudness < LOUDNESS_THRESH) {
         continue;
       }
@@ -87,7 +90,7 @@ const getMatchingBeats = (beats1, beats2) => {
       if (timbreDist > TIMBRE_DIST_THRESH) {
         continue;
       }
-      var overall = Math.sqrt(2 * timbreDist ** 2 + pitchDist ** 2);
+      var overall = Math.sqrt(5 * timbreDist ** 2 + pitchDist ** 2);
       if (minDist.pitches === undefined) {
         minDist.pitches = pitchDist;
         minDist.timbre = timbreDist;
@@ -104,7 +107,11 @@ const getMatchingBeats = (beats1, beats2) => {
       matches.push([beats1[i], beats2[minDist.index], minDist]);
     }
   }
-  return matches;
+  var timeIndexedMatches = {};
+  matches.forEach(match => {
+    timeIndexedMatches[match[0].start] = match[1].start;
+  });
+  return timeIndexedMatches;
 
 };
 
