@@ -12,9 +12,10 @@ const App = () => {
 
 
   useEffect(() => {
-    fetch('/api')
+    fetch('/api2')
       .then(response => response.json())
-      .then(paths => {
+      .then(parsed => {
+        var paths = parsed.map(song => song.paths);
         console.log(paths);
         setPaths(paths);
         console.log('paths loaded');
@@ -59,7 +60,7 @@ const App = () => {
 
   return (
     <div>
-      <audio ref={audio1} id="audio1" src="assets/music/oopsIDidItAgain.mp3" preload="auto" type="audio/mpeg" controls onCanPlayThrough={() => setReady1(true)} onTimeUpdate={handleTimeUpdate}>
+      <audio ref={audio1} id="audio1" src="assets/music/babyOneMoreTime.mp3" preload="auto" type="audio/mpeg" controls onCanPlayThrough={() => setReady1(true)} onTimeUpdate={handleTimeUpdate}>
         Your browser does not support the audio tag
       </audio>
       <audio ref={audio2} id="audio2" src="assets/music/babyOneMoreTime.mp3" preload="auto" type="audio/mpeg" controls onCanPlayThrough={() => setReady2(true)} onTimeUpdate={handleTimeUpdate}>Your browser does not support the audio tag</audio>
