@@ -13,7 +13,7 @@ const App = () => {
 
 
   useEffect(() => {
-    fetch('/api2')
+    fetch('/api2?track=gangnam style &artist=psy')
       .then(response => response.json())
       .then(parsed => {
         var paths = parsed.map(song => song.paths);
@@ -61,10 +61,10 @@ const App = () => {
 
   return (
     <div>
-      <audio ref={audio1} id="audio1" src="assets/music/babyOneMoreTime.mp3" preload="auto" type="audio/mpeg" controls onCanPlayThrough={() => setReady1(true)} onTimeUpdate={handleTimeUpdate}>
+      <audio ref={audio1} id="audio1" src="assets/music/gangnamStyle.mp3" preload="auto" type="audio/mpeg" controls onCanPlayThrough={() => setReady1(true)} onTimeUpdate={handleTimeUpdate}>
         Your browser does not support the audio tag
       </audio>
-      <audio ref={audio2} id="audio2" src="assets/music/babyOneMoreTime.mp3" preload="auto" type="audio/mpeg" controls onCanPlayThrough={() => setReady2(true)} onTimeUpdate={handleTimeUpdate}>Your browser does not support the audio tag</audio>
+      <audio ref={audio2} id="audio2" src="assets/music/gangnamStyle.mp3" preload="auto" type="audio/mpeg" controls onCanPlayThrough={() => setReady2(true)} onTimeUpdate={handleTimeUpdate}>Your browser does not support the audio tag</audio>
       <button disabled={!ready1 || !ready2 || (paths.length === 0)} onClick={() => audio1.current.play()}>Play!</button>
       <Mash currentTime={prevTime[0]} duration={audio1.current ? audio1.current.duration : 180}/>
     </div>
