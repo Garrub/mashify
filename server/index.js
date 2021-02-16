@@ -20,7 +20,7 @@ app.get('/api', (req, res) => {
     .then(data => {
       spotifyApi.setAccessToken(data.body['access_token']);
     })
-    .then(() => spotifyApi.searchTracks('track:oops I did it again artist:Britney Spears'))
+    .then(() => spotifyApi.searchTracks('track:oops I did it again artist:britney spears'))
     .then(data => spotifyApi.getAudioAnalysisForTrack(data.body.tracks.items[0].id))
     .then(analysis => {
       //console.log(analysis.body.segments);
@@ -38,7 +38,7 @@ app.get('/api', (req, res) => {
       decorateBeats(analysis.body.beats, analysis.body.segments);
       song1 = analysis.body.beats
     })
-    .then(() => spotifyApi.searchTracks('track:baby one more time artist:Britney Spears'))
+    .then(() => spotifyApi.searchTracks('track:baby one more time artist:britney spears'))
     .then(data => spotifyApi.getAudioAnalysisForTrack(data.body.tracks.items[0].id))
     .then(analysis => {
       decorateBeats(analysis.body.beats, analysis.body.segments)
@@ -61,6 +61,42 @@ app.get('/api2', (req, res) => {
       spotifyApi.setAccessToken(data.body['access_token']);
     })
     .then(() => spotifyApi.searchTracks('track:baby one more time artist:Britney Spears'))
+    .then(data => spotifyApi.getAudioAnalysisForTrack(data.body.tracks.items[0].id))
+    .then(analysis => {
+      //console.log(analysis.body.segments);
+      //var events = analysis.body.segments.map(segment2event);
+      //res.send(events);
+      /*decorateBeats(analysis.body.beats, analysis.body.segments, (err, beats) => {
+        if (err) {
+          console.log('errrrr');
+          res.status(500).send(err);
+        } else {
+          console.log('here');
+          res.send(beats);
+        }
+      });*/
+      decorateBeats(analysis.body.beats, analysis.body.segments);
+      song1 = analysis.body.beats;
+      song2 = analysis.body.beats;
+    })
+    .then(() => {
+      var match = getMatchingBeats(song1, song2, 'same');
+      res.send([match, match]);
+    })
+    .catch(err => {
+      console.error(err);
+      res.status(500).send(err)
+    });
+});
+
+app.get('/api3', (req, res) => {
+  var song1;
+  var song2;
+  spotifyApi.clientCredentialsGrant()
+    .then(data => {
+      spotifyApi.setAccessToken(data.body['access_token']);
+    })
+    .then(() => spotifyApi.searchTracks('track:masterpiece theatre II artist:mariana\'s trench'))
     .then(data => spotifyApi.getAudioAnalysisForTrack(data.body.tracks.items[0].id))
     .then(analysis => {
       //console.log(analysis.body.segments);
