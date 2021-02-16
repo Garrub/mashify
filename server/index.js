@@ -16,36 +16,35 @@ var spotifyApi = new SpotifyWebApi({
 app.get('/api', (req, res) => {
   var song1;
   var song2;
+  var track1 = req.query.track1 || 'oops I did it again';
+  var artist1 = req.query.artist1 || 'britney spears';
+  var track2 = req.query.track2 || 'baby one more time';
+  var artist2 = req.query.artist2 || 'britney spears';
+  var {pitch, timbre, loud} = req.query;
   spotifyApi.clientCredentialsGrant()
     .then(data => {
       spotifyApi.setAccessToken(data.body['access_token']);
     })
-    .then(() => spotifyApi.searchTracks('track:oops I did it again artist:britney spears'))
+    .then(() => spotifyApi.searchTracks(`track:${track1} artist:${artist1}`))
     .then(data => spotifyApi.getAudioAnalysisForTrack(data.body.tracks.items[0].id))
     .then(analysis => {
-      //console.log(analysis.body.segments);
-      //var events = analysis.body.segments.map(segment2event);
-      //res.send(events);
-      /*decorateBeats(analysis.body.beats, analysis.body.segments, (err, beats) => {
-        if (err) {
-          console.log('errrrr');
-          res.status(500).send(err);
-        } else {
-          console.log('here');
-          res.send(beats);
-        }
-      });*/
       decorateBeats(analysis.body.beats, analysis.body.segments);
       song1 = analysis.body.beats
     })
-    .then(() => spotifyApi.searchTracks('track:baby one more time artist:britney spears'))
+    .then(() => spotifyApi.searchTracks(`track:${track2} artist:${artist2}`))
     .then(data => spotifyApi.getAudioAnalysisForTrack(data.body.tracks.items[0].id))
     .then(analysis => {
       decorateBeats(analysis.body.beats, analysis.body.segments)
       song2 = analysis.body.beats;
     })
     .then(() => {
-      res.send([getMatchingBeats(song1, song2), getMatchingBeats(song2, song1)]);
+      res.send([{
+        paths: getMatchingBeats(song1, song2, null, timbre, pitch, loud),
+        length: song1.length
+      }, {
+        paths: getMatchingBeats(song2, song1, null, timbre, pitch, loud),
+        length: song2.length
+      }]);
     })
     .catch(err => {
       console.error(err);
@@ -56,68 +55,29 @@ app.get('/api', (req, res) => {
 app.get('/api2', (req, res) => {
   var song1;
   var song2;
+  var track = req.query.track || 'baby one more time';
+  var artist = req.query.artist || 'britney spears';
+  var {pitch, timbre, loud} = req.query;
   spotifyApi.clientCredentialsGrant()
     .then(data => {
       spotifyApi.setAccessToken(data.body['access_token']);
     })
-    .then(() => spotifyApi.searchTracks('track:baby one more time artist:Britney Spears'))
+    .then(() => spotifyApi.searchTracks(`track:${track} artist:${artist}`))
     .then(data => spotifyApi.getAudioAnalysisForTrack(data.body.tracks.items[0].id))
     .then(analysis => {
-      //console.log(analysis.body.segments);
-      //var events = analysis.body.segments.map(segment2event);
-      //res.send(events);
-      /*decorateBeats(analysis.body.beats, analysis.body.segments, (err, beats) => {
-        if (err) {
-          console.log('errrrr');
-          res.status(500).send(err);
-        } else {
-          console.log('here');
-          res.send(beats);
-        }
-      });*/
       decorateBeats(analysis.body.beats, analysis.body.segments);
       song1 = analysis.body.beats;
       song2 = analysis.body.beats;
     })
     .then(() => {
-      var match = getMatchingBeats(song1, song2, 'same');
-      res.send([match, match]);
-    })
-    .catch(err => {
-      console.error(err);
-      res.status(500).send(err)
-    });
-});
-
-app.get('/api3', (req, res) => {
-  var song1;
-  var song2;
-  spotifyApi.clientCredentialsGrant()
-    .then(data => {
-      spotifyApi.setAccessToken(data.body['access_token']);
-    })
-    .then(() => spotifyApi.searchTracks('track:masterpiece theatre II artist:mariana\'s trench'))
-    .then(data => spotifyApi.getAudioAnalysisForTrack(data.body.tracks.items[0].id))
-    .then(analysis => {
-      //console.log(analysis.body.segments);
-      //var events = analysis.body.segments.map(segment2event);
-      //res.send(events);
-      /*decorateBeats(analysis.body.beats, analysis.body.segments, (err, beats) => {
-        if (err) {
-          console.log('errrrr');
-          res.status(500).send(err);
-        } else {
-          console.log('here');
-          res.send(beats);
-        }
-      });*/
-      decorateBeats(analysis.body.beats, analysis.body.segments);
-      song1 = analysis.body.beats;
-      song2 = analysis.body.beats;
-    })
-    .then(() => {
-      var match = getMatchingBeats(song1, song2, 'same');
-      res.send([match, match]);
+      var match = getMatchingBeats(song1, song2, 'same', timbre, pitch, loud);
+      res.send([{
+        paths: match,
+        length: song1.length
+      }, {
+        paths: match,
+        length: song2.length
+      }]);
     })
     .catch(err => {
       console.error(err);
