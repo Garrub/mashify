@@ -42,7 +42,11 @@ const SongForm = (props) => {
   );
 };
 
-const FormContainer = styled.form``;
+const FormContainer = styled.form`
+  margin-bottom: 20px;
+  display: flex;
+  gap: 4px;
+`;
 const Menu = styled.select``;
 const UserInput = styled.input``;
 const FieldLabel = styled.label``;

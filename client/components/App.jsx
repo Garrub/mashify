@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import styled, { createGlobalStyle } from 'styled-components';
 import Mash from './Mash.jsx';
 import SongForm from './SongForm.jsx';
 import songlist from '../lib/songlist.js';
@@ -40,14 +41,14 @@ const App = () => {
   const fetchSongs = (songId1, songId2, timbre) => {
     var songs = updateTargetSongs(songId1, songId2);
     fetch(buildUrl(songs, timbre))
-    .then(response => response.json())
-    .then(parsed => {
-      var paths = parsed.map(song => song.paths);
-      console.log(paths);
-      setPaths(paths);
-      console.log('paths loaded');
-    })
-    .catch(err => console.error(err));
+      .then(response => response.json())
+      .then(parsed => {
+        var paths = parsed.map(song => song.paths);
+        console.log(paths);
+        setPaths(paths);
+        console.log('paths loaded');
+      })
+      .catch(err => console.error(err));
   };
 
   const buildUrl = (songs, timbre) => {
@@ -88,26 +89,59 @@ const App = () => {
 
   return (
     <div>
-      <SongForm fetchSongs={fetchSongs}/>
-      {!targetSongs[0] ? null : <audio ref={audio1} id="audio1" src={`assets/music/${targetSongs[0].id}.mp3`} preload="auto" type="audio/mpeg" onCanPlayThrough={() => setReady1(true)} onTimeUpdate={handleTimeUpdate}>
-        Your browser does not support the audio tag
+      <GlobalStyle />
+      <Header>MASHIFY</Header>
+      <AppContainer>
+        <SongForm fetchSongs={fetchSongs} />
+        {!targetSongs[0] ? null : <audio ref={audio1} id="audio1" src={`assets/music/${targetSongs[0].id}.mp3`} preload="auto" type="audio/mpeg" onCanPlayThrough={() => setReady1(true)} onTimeUpdate={handleTimeUpdate}>
+          Your browser does not support the audio tag
       </audio>}
-      {!targetSongs[0] ? null : <audio ref={audio2} id="audio2" src={`assets/music/${targetSongs[1] ? targetSongs[1].id : targetSongs[0].id}.mp3`} preload="auto" type="audio/mpeg" onCanPlayThrough={() => setReady2(true)} onTimeUpdate={handleTimeUpdate}>Your browser does not support the audio tag</audio>}
-      <button disabled={!ready1 || !ready2 || (paths.length === 0)} onClick={() => {
-        if (paused) {
-          currentAudio.current.play();
-          setPaused(false);
-        } else {
-          currentAudio.current.pause();
-          setPaused(true);
-        }
-        }}>{paused ? 'Play' : 'Pause'}</button>
-      <Mash songs={[
-        {currentTime: prevTime[0], duration: audio1.current ? audio1.current.duration : 180, paths: paths[0]},
-        {currentTime: prevTime[1], duration: audio2.current ? audio2.current.duration : 180, paths: paths[1]}
-      ]} seek={seek}/>
+        {!targetSongs[0] ? null : <audio ref={audio2} id="audio2" src={`assets/music/${targetSongs[1] ? targetSongs[1].id : targetSongs[0].id}.mp3`} preload="auto" type="audio/mpeg" onCanPlayThrough={() => setReady2(true)} onTimeUpdate={handleTimeUpdate}>Your browser does not support the audio tag</audio>}
+        <Button disabled={!ready1 || !ready2 || (paths.length === 0)} onClick={() => {
+          if (paused) {
+            currentAudio.current.play();
+            setPaused(false);
+          } else {
+            currentAudio.current.pause();
+            setPaused(true);
+          }
+        }}>{paused ? '\u25B6' : '\u275a\u275a'}</Button>
+        <Mash songs={[
+          { currentTime: prevTime[0], duration: audio1.current ? audio1.current.duration : 180, paths: paths[0] },
+          { currentTime: prevTime[1], duration: audio2.current ? audio2.current.duration : 180, paths: paths[1] }
+        ]} seek={seek} />
+      </AppContainer>
     </div>
   );
 };
+
+const GlobalStyle = createGlobalStyle`
+  body {
+    margin: 0;
+    color: #fff;
+    background-color: #202020;
+    font-family: 'Montserrat', sans-serif;
+  }
+`;
+
+const Header = styled.h1`
+  text-align: center;
+  font-size: 42px;
+  line-height: 1em;
+`;
+const AppContainer = styled.div`
+  width: 1000px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 10px auto;
+
+`;
+const Button = styled.button`
+  width: 100px;
+  height: 66px;
+  margin-bottom: 20px;
+  font-size: 30px;
+`;
 
 export default App;
