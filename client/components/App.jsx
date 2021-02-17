@@ -118,6 +118,8 @@ const App = () => {
             setVolume(Number(e.target.value));
             if (audio1.current && audio2.current) {
               audio1.current.volume = Number(e.target.value);
+              audio2.current.volume = Number(e.target.value);
+
             }
           }}/>
         </div>
