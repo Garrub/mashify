@@ -2,10 +2,10 @@ import React from 'react';
 import styled from 'styled-components';
 import SongBar from './SongBar.jsx';
 
-const Mash = (props) => {
+const Mash = ({songs}) => {
   return (
     <MashContainer>
-      <SongBar currentTime={props.currentTime} duration={props.duration}/>
+      {songs.map((song, i) => <SongBar key={`sb${i}`} currentTime={song.currentTime} duration={song.duration}/>)}
     </MashContainer>
   );
 };
