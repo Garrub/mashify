@@ -2,12 +2,12 @@ import React from 'react';
 import styled from 'styled-components';
 import SongBar from './SongBar.jsx';
 
-const Mash = ({ songs }) => {
+const Mash = ({ songs, seek }) => {
   var paths1 = !songs[0].paths ? [] : Object.keys(songs[0].paths).map(startTime => [startTime, songs[0].paths[startTime]]);
   var paths2 = !songs[1].paths ? [] : Object.keys(songs[1].paths).map(startTime => [startTime, songs[1].paths[startTime]]);
   return (
     <MashContainer>
-      {songs.map((song, i) => <SongBar key={`sb${i}`} currentTime={song.currentTime} duration={song.duration} order={i * 2} />)}
+      {songs.map((song, i) => <SongBar key={`sb${i}`} id={`sb${i}`} seek={seek} currentTime={song.currentTime} duration={song.duration} order={i * 2} />)}
       <MashLines xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 300">
         <defs>
           <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">

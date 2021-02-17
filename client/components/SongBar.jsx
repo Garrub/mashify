@@ -1,10 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
 
-const SongBar = ({currentTime, duration, order}) => {
+const SongBar = ({currentTime, duration, order, id, seek}) => {
   var played = `${currentTime / duration * 100}%`;
   return (
-    <SongBarContainer played={played} order={order}/>
+    <SongBarContainer played={played} order={order} id={id} onClick={seek}/>
   );
 };
 
