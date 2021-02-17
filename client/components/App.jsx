@@ -15,6 +15,7 @@ const App = () => {
   const [targetSongs, setTargetSongs] = useState([]);
   const [currentAudio, setCurrentAudio] = useState(audio1);
   const [paused, setPaused] = useState(true);
+  const [volume, setVolume] = useState(0.5);
 
 
   const seek = (e) => {
@@ -93,20 +94,34 @@ const App = () => {
       <Header>MASHIFY</Header>
       <AppContainer>
         <SongForm fetchSongs={fetchSongs} />
-        {!targetSongs[0] ? null : <audio ref={audio1} id="audio1" src={`assets/music/${targetSongs[0].id}.mp3`} preload="auto" type="audio/mpeg" onCanPlayThrough={() => setReady1(true)} onTimeUpdate={handleTimeUpdate}>
+        {!targetSongs[0] ? null : <audio ref={audio1} id="audio1" src={`assets/music/${targetSongs[0].id}.mp3`} preload="auto" type="audio/mpeg" onCanPlayThrough={(e) => {
+          setReady1(true);
+          e.target.volume = volume;
+        }} onTimeUpdate={handleTimeUpdate}>
           Your browser does not support the audio tag
       </audio>}
-        {!targetSongs[0] ? null : <audio ref={audio2} id="audio2" src={`assets/music/${targetSongs[1] ? targetSongs[1].id : targetSongs[0].id}.mp3`} preload="auto" type="audio/mpeg" onCanPlayThrough={() => setReady2(true)} onTimeUpdate={handleTimeUpdate}>Your browser does not support the audio tag</audio>}
-        <Button disabled={!ready1 || !ready2 || (paths.length === 0)} onClick={() => {
-          if (paused) {
-            currentAudio.current.play();
-            setPaused(false);
-          } else {
-            currentAudio.current.pause();
-            setPaused(true);
-          }
-        }}>{paused ? '\u25B6' : '\u275a\u275a'}</Button>
-        <Mash songs={[
+        {!targetSongs[0] ? null : <audio ref={audio2} id="audio2" src={`assets/music/${targetSongs[1] ? targetSongs[1].id : targetSongs[0].id}.mp3`} preload="auto" type="audio/mpeg" onCanPlayThrough={(e) => {
+          setReady2(true);
+          e.target.volume = volume;
+        }} onTimeUpdate={handleTimeUpdate}>Your browser does not support the audio tag</audio>}
+        <div>
+          <Button disabled={!ready1 || !ready2 || (paths.length === 0)} onClick={() => {
+            if (paused) {
+              currentAudio.current.play();
+              setPaused(false);
+            } else {
+              currentAudio.current.pause();
+              setPaused(true);
+            }
+          }}>{paused ? '\u25B6' : '\u275a\u275a'}</Button>
+          <Volume type="range" min="0.0" max="1.0" step="0.1" value={volume} onChange={e => {
+            setVolume(Number(e.target.value));
+            if (audio1.current && audio2.current) {
+              audio1.current.volume = Number(e.target.value);
+            }
+          }}/>
+        </div>
+        <Mash playing={currentAudio.current ? currentAudio.current.id : null} songs={[
           { currentTime: prevTime[0], duration: audio1.current ? audio1.current.duration : 180, paths: paths[0] },
           { currentTime: prevTime[1], duration: audio2.current ? audio2.current.duration : 180, paths: paths[1] }
         ]} seek={seek} />
@@ -116,6 +131,9 @@ const App = () => {
 };
 
 const GlobalStyle = createGlobalStyle`
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
   body {
     margin: 0;
     color: #fff;
@@ -142,6 +160,11 @@ const Button = styled.button`
   height: 66px;
   margin-bottom: 20px;
   font-size: 30px;
+`;
+
+const Volume = styled.input`
+  transform: rotate(-90deg);
+  width: 66px;
 `;
 
 export default App;
