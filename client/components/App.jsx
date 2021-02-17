@@ -12,6 +12,7 @@ const App = () => {
   const [swapping, setSwapping] = useState(false);
   const [prevTime, setPrevTime] = useState([0, 0]);
   const [targetSongs, setTargetSongs] = useState([]);
+  const [currentAudio, setCurrentAudio] = useState(audio1);
 
 
   const seek = (e) => {
@@ -68,6 +69,7 @@ const App = () => {
           setSwapping(true);
           var target = Number(paths[idx][timestamps[i]]);
           console.log(`swap to ${nextAudio.current.id}: from ${e.target.id}@${e.target.currentTime} to ${nextAudio.current.id}@${target}, prev: ${prevTime[idx]}`);
+          setCurrentAudio(nextAudio);
           nextAudio.current.currentTime = target;
           nextAudio.current.play();
           e.target.pause();
@@ -91,7 +93,10 @@ const App = () => {
         Your browser does not support the audio tag
       </audio>}
       {!targetSongs[0] ? null : <audio ref={audio2} id="audio2" src={`assets/music/${targetSongs[1] ? targetSongs[1].id : targetSongs[0].id}.mp3`} preload="auto" type="audio/mpeg" controls onCanPlayThrough={() => setReady2(true)} onTimeUpdate={handleTimeUpdate}>Your browser does not support the audio tag</audio>}
-      <button disabled={!ready1 || !ready2 || (paths.length === 0)} onClick={() => audio1.current.play()}>Play!</button>
+      <button disabled={!ready1 || !ready2 || (paths.length === 0)} onClick={() => {currentAudio.current.play()}}>Play!</button>
+      <button onClick={() => {
+        currentAudio.current.pause();
+      }}>Pause</button>
       <Mash songs={[
         {currentTime: prevTime[0], duration: audio1.current ? audio1.current.duration : 180, paths: paths[0]},
         {currentTime: prevTime[1], duration: audio2.current ? audio2.current.duration : 180, paths: paths[1]}
