@@ -13,6 +13,7 @@ const App = () => {
   const [prevTime, setPrevTime] = useState([0, 0]);
   const [targetSongs, setTargetSongs] = useState([]);
   const [currentAudio, setCurrentAudio] = useState(audio1);
+  const [paused, setPaused] = useState(true);
 
 
   const seek = (e) => {
@@ -21,7 +22,6 @@ const App = () => {
       return;
     }
     setSwapping(true);
-    console.log(e.target);
     var ref = e.target.id === 'sb0' ? audio1 : audio2;
     ref.current.currentTime = e.nativeEvent.offsetX / 700 * ref.current.duration;
   };
@@ -89,14 +89,19 @@ const App = () => {
   return (
     <div>
       <SongForm fetchSongs={fetchSongs}/>
-      {!targetSongs[0] ? null : <audio ref={audio1} id="audio1" src={`assets/music/${targetSongs[0].id}.mp3`} preload="auto" type="audio/mpeg" controls onCanPlayThrough={() => setReady1(true)} onTimeUpdate={handleTimeUpdate}>
+      {!targetSongs[0] ? null : <audio ref={audio1} id="audio1" src={`assets/music/${targetSongs[0].id}.mp3`} preload="auto" type="audio/mpeg" onCanPlayThrough={() => setReady1(true)} onTimeUpdate={handleTimeUpdate}>
         Your browser does not support the audio tag
       </audio>}
-      {!targetSongs[0] ? null : <audio ref={audio2} id="audio2" src={`assets/music/${targetSongs[1] ? targetSongs[1].id : targetSongs[0].id}.mp3`} preload="auto" type="audio/mpeg" controls onCanPlayThrough={() => setReady2(true)} onTimeUpdate={handleTimeUpdate}>Your browser does not support the audio tag</audio>}
-      <button disabled={!ready1 || !ready2 || (paths.length === 0)} onClick={() => {currentAudio.current.play()}}>Play!</button>
-      <button onClick={() => {
-        currentAudio.current.pause();
-      }}>Pause</button>
+      {!targetSongs[0] ? null : <audio ref={audio2} id="audio2" src={`assets/music/${targetSongs[1] ? targetSongs[1].id : targetSongs[0].id}.mp3`} preload="auto" type="audio/mpeg" onCanPlayThrough={() => setReady2(true)} onTimeUpdate={handleTimeUpdate}>Your browser does not support the audio tag</audio>}
+      <button disabled={!ready1 || !ready2 || (paths.length === 0)} onClick={() => {
+        if (paused) {
+          currentAudio.current.play();
+          setPaused(false);
+        } else {
+          currentAudio.current.pause();
+          setPaused(true);
+        }
+        }}>{paused ? 'Play' : 'Pause'}</button>
       <Mash songs={[
         {currentTime: prevTime[0], duration: audio1.current ? audio1.current.duration : 180, paths: paths[0]},
         {currentTime: prevTime[1], duration: audio2.current ? audio2.current.duration : 180, paths: paths[1]}
